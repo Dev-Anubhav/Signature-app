@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signature</title>
+    <style>
+
+.section{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+}
+
+.coloritems, .bottom{
+    display: flex;
+    justify-content: space-between; align-items: center;
+    margin: 20px 0 20px 0;
+}
+
+
+canvas{
+    border: 1px solid black;
+}
+
+.block, input, select, button{width: 80%;}
+.bottom button:nth-child(1){
+    background: red;
+    color: black;
+}
+.bottom button:nth-child(2){
+    background: green;
+    color: black;
+}
+.bottom button:nth-child(3){
+    background: yellow;
+    color: black;
+}
+
+
+
+    </style>
+</head>
+<body>
+    <div class="section">
+        <div class="coloritems">
+            <div class="block">
+                <p>Color Picker</p>
+                <input type="color" class="colorpick">
+            </div>
+            <div class="block">
+                <p>Background Picker</p>
+                <input type="color" class="bgpick">
+            </div>
+            <div class="block">
+                <p>Font Size</p>
+                <select class="font">
+                    <option value="5">5px</option>
+                    <option value="10">10px</option>
+                    <option value="20">20px</option>
+                    <option value="40">40px</option>
+                </select>
+            </div>
+        </div>
+            <canvas height="400" width="700" class="canvas">
+
+            </canvas>
+            <div class="bottom">
+                <button class="clearbtn">Clear</button>
+                <button class="savebtn">Save</button>
+                <button class="retbtn">Retrieve</button>
+            </div>
+    </div>
+    <script>
+        const colorpicker = document.querySelector(".colorpick");
+        const bgpicker = document.querySelector(".bgpick");
+        const font = document.querySelector(".font");
+        const canvas = document.querySelector(".canvas");
+        const clear = document.querySelector(".clearbtn");
+        const save = document.querySelector(".savebtn");
+        const retrive = document.querySelector(".retbtn");
+        const ctx = canvas.getContext("2d");
+
+        colorpicker.addEventListener("change",(e)=>{
+            ctx.strokeStyle = e.target.value;
+            ctx.fillStyle = e.target.value;
+        })
+
+        canvas.addEventListener("mousedown",(e)=>{
+            isDrawing = true;
+            lastX = e.offsetX;
+            lastY = e.offsetY;
+        })
+
+        canvas.addEventListener("mousemove",(e)=>{
+            if(isDrawing){
+                ctx.beginPath();
+                ctx.moveTo(lastX, lastY);
+                ctx.lineTo(e.offsetX, e.offsetY);
+                ctx.stroke();
+
+                lastX = e.offsetX;
+                lastY = e.offsetY;
+            }
+        })
+
+        canvas.addEventListener("mouseup",(e)=>{
+            isDrawing = false;
+        })
+
+        bgpicker.addEventListener("change",(e)=>{
+            ctx.fillStyle = e.target.value;
+            ctx.fillRect(0,0,700,400)
+        })
+
+        font.addEventListener("change",(e)=>{
+            ctx.lineWidth = e.target.value
+        })
+
+        clear.addEventListener("click",(e)=>{
+            ctx.clearRect(0,0,700,400)
+        })
+
+        save.addEventListener("click",(e)=>{
+            localStorage.setItem('canvasContents',canvas.toDataURL());
+
+            const link = document.createElement("a");
+
+            link.download = 'my-canvas.png' ;
+
+            link.href = canvas.toDataURL();
+
+            link.click();
+        })
+
+        retrive.addEventListener("click",()=>{
+            let savedConvas = localStorage.getItem('canvasContents')
+            if(savedConvas){
+                let img = new Image();
+                img.src = savedConvas;
+                ctx.drawImage(img,0,0);
+            }
+        })
+
+    </script>
+
+</body>
+</html>
